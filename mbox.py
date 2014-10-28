@@ -3,6 +3,7 @@
 import mailbox
 import sys
 import csv
+import re
 
 def usage():
   print ("mbox.py: Parse mbox file")
@@ -20,23 +21,30 @@ def main():
     exit(-2)
   mbox = sys.argv[1]
   outfile = sys.argv[2]
+  ipPattern = re.compile('\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}')
+
 
   f = open(sys.argv[2], 'wt')
   try:
     	writer = csv.writer(f)
-  	writer.writerow( ('Date','From', 'To', 'Subject', 'Received-Last','X-Mailer'))
+  	writer.writerow( ('Date','From','Return-Path','To','X-To','Subject','Received-Last','X-IP','X-Mailer'))
 
 	for message in mailbox.mbox(mbox):
     		From = str(message['From'])
+		Return = str(message['Return-Path'])
 		To = str(message['To'])
+		XTo = str(message['X-Apparently-To'])
+		#findIP = re.findall(ipPattern,s)
 		Date = str(message['Date'])
 		Subject = str(message['Subject'])
-		Received = str(message['Received'])
-		XMailer = str(message['X-Mailer'])			
+		Received = str(re.findall(ipPattern,str(message['Received'])))
+		Received = Received.replace("127.0.0.1", "")
+		XIP = str(message['X-Originating-IP'])
+		XMailer = str(message['X-Mailer'])
+		#Attachment = message.get_filename()			
 		#Body = str(message['Body'])
 		
-		writer.writerow((Date,From,To,Subject,Received,XMailer))    		
-		        
+		writer.writerow((Date,From,Return,To,XTo,Subject,Received,XIP,XMailer))    		
   finally:
     	f.close()
 
