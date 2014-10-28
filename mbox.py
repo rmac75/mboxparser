@@ -4,6 +4,7 @@ import mailbox
 import sys
 import csv
 import re
+import pprint
 
 def usage():
   print ("mbox.py: Parse mbox file")
@@ -37,14 +38,23 @@ def main():
 		#findIP = re.findall(ipPattern,s)
 		Date = str(message['Date'])
 		Subject = str(message['Subject'])
-		Received = str(re.findall(ipPattern,str(message['Received'])))
-		Received = Received.replace("127.0.0.1", "")
-		XIP = str(message['X-Originating-IP'])
+
+		Received = re.findall(ipPattern,str(message['Received']))
+		if Received:
+			print Received[-1]
+		else:
+			Received = "None"	
+		
+		XIP = message['X-Originating-IP']
+		if XIP:
+			XIP = str(XIP).strip('[]')
+		else:
+			XIP = "None"
 		XMailer = str(message['X-Mailer'])
 		#Attachment = message.get_filename()			
 		#Body = str(message['Body'])
 		
-		writer.writerow((Date,From,Return,To,XTo,Subject,Received,XIP,XMailer))    		
+		writer.writerow((Date,From,Return,To,XTo,Subject,Received[-1],XIP,XMailer))    		
   finally:
     	f.close()
 
