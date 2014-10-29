@@ -10,13 +10,13 @@ import argparse
 import geoip2.database
 
 def main():
- 
+
   # first some sanity tests on the command-line arguments
   #sys.argv = ['mbox_to_mysql','list1.mbox','mailman','lists',] # !@!@! APS here for testing purposes only - comment out for live run
- 
+
   parser = argparse.ArgumentParser(description='Parse mbox file')
   parser.add_argument('mbox', help='mbox file to parse')
-  parser.add_argument('outfile', help='output csv file:')
+  parser.add_argument('outfile', help='output csv file')
   args = parser.parse_args()
   if not path.isfile(args.mbox):
       parser.error("the file %s does not exist"%args.mbox)
@@ -44,18 +44,18 @@ def main():
 		if Received:
 			print Received[-1]
 		else:
-			Received = "None"	
-		
+			Received = "None"
+
 		XIP = message['X-Originating-IP']
 		if XIP:
 			XIP = str(XIP).strip('[]')
 		else:
 			XIP = "None"
 		XMailer = str(message['X-Mailer'])
-		#Attachment = message.get_filename()			
+		#Attachment = message.get_filename()
 		#Body = str(message['Body'])
-		
-		writer.writerow((Date,From,Return,To,XTo,Subject,Received[-1],XIP,XMailer))    		
+
+		writer.writerow((Date,From,Return,To,XTo,Subject,Received[-1],XIP,XMailer))
   finally:
     	f.close()
 
