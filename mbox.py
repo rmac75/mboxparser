@@ -8,6 +8,7 @@ from os import path
 import pprint
 import argparse
 import geoip2.database
+import geoip2.errors
 
 def get_iprecord(ip):
     try:
