@@ -9,6 +9,13 @@ import pprint
 import argparse
 import geoip2.database
 
+def get_iprecord(ip):
+    try:
+        geo = reader.city(ip)
+    except (geoip2.errors.AddressNotFoundError, ValueError):
+        return ip, None
+    return ip, geo.country.iso_code
+
 def main():
 
   # first some sanity tests on the command-line arguments
