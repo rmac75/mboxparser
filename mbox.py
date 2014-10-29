@@ -14,8 +14,8 @@ def get_iprecord(ip):
     try:
         geo = reader.city(ip)
     except (geoip2.errors.AddressNotFoundError, ValueError):
-        return ip, None
-    return ip, geo.country.iso_code
+        return None
+    return geo.country.iso_code, geo.city.name
 
 def main():
 
