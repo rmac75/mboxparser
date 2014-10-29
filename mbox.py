@@ -1,10 +1,12 @@
-#!/usr/bin/python
+#!/usr/bin/python2
 
 import mailbox
 import sys
 import csv
 import re
 import pprint
+import argparse
+import geoip2.database
 
 def usage():
   print ("mbox.py: Parse mbox file")
@@ -24,6 +26,7 @@ def main():
   outfile = sys.argv[2]
   ipPattern = re.compile('\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}')
 
+  reader = geoip2.database.Reader('geo/GeoIP2-City.mmdb')
 
   f = open(sys.argv[2], 'wt')
   try:
