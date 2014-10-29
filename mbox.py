@@ -4,31 +4,29 @@ import mailbox
 import sys
 import csv
 import re
+from os import path
 import pprint
 import argparse
 import geoip2.database
-
-def usage():
-  print ("mbox.py: Parse mbox file")
-  print ("Usage: %s mboxfile outfile" % sys.argv[0])
-  print ("Example: ./%s mbox_file output.csv \n" % sys.argv[0])
-  exit(0)
 
 def main():
  
   # first some sanity tests on the command-line arguments
   #sys.argv = ['mbox_to_mysql','list1.mbox','mailman','lists',] # !@!@! APS here for testing purposes only - comment out for live run
  
-  if len(sys.argv) != 3:
-    usage()
-    exit(-2)
-  mbox = sys.argv[1]
-  outfile = sys.argv[2]
+  parser = argparse.ArgumentParser(description='Parse mbox file')
+  parser.add_argument('mbox', help='mbox file to parse')
+  parser.add_argument('outfile', help='output csv file:')
+  args = parser.parse_args()
+  if not path.isfile(args.mbox):
+      parser.error("the file %s does not exist"%args.mbox)
+  mbox = args.mbox
+  outfile = args.outfile
   ipPattern = re.compile('\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}')
 
   reader = geoip2.database.Reader('geo/GeoIP2-City.mmdb')
 
-  f = open(sys.argv[2], 'wt')
+  f = open(outfile, 'wt')
   try:
     	writer = csv.writer(f)
   	writer.writerow( ('Date','From','Return-Path','To','X-To','Subject','Received-Last','X-IP','X-Mailer'))
