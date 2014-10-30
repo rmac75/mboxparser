@@ -1,5 +1,12 @@
 #!/usr/bin/python2
 
+#--------------------------------
+#Takes in mbox, spits out csv with email info and basic geolocation, plus other header fields.
+#--------------------------------
+
+#This product includes GeoLite2 data created by MaxMind, available from
+#<a href="http://www.maxmind.com">http://www.maxmind.com</a>.
+
 import mailbox
 import sys
 import csv
