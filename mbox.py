@@ -14,8 +14,13 @@ def get_iprecord(ip):
     try:
         geo = reader.city(ip)
     except (geoip2.errors.AddressNotFoundError, ValueError):
-        return None
-    return geo.country.iso_code, geo.city.name
+        return None,None
+    if geo.city.name:
+	cityname=geo.city.name.encode('ascii','ignore')
+    else:
+	cityname=geo.city.name
+
+    return geo.country.iso_code, cityname
 
 def main():
 
@@ -32,12 +37,13 @@ def main():
   outfile = args.outfile
   ipPattern = re.compile('\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}')
 
-  reader = geoip2.database.Reader('geo/GeoIP2-City.mmdb')
+  global reader
+  reader = geoip2.database.Reader('geo/GeoLite2-City.mmdb')
 
   f = open(outfile, 'wt')
   try:
     	writer = csv.writer(f)
-  	writer.writerow( ('Date','From','Return-Path','To','X-To','Subject','Received-Last','X-IP','X-Mailer'))
+  	writer.writerow( ('Date','From','Return-Path','To','X-To','Subject','Received-Last', 'City', 'Country','X-IP', 'X-City', 'X-Country','X-Mailer'))
 
 	for message in mailbox.mbox(mbox):
     		From = str(message['From'])
@@ -51,19 +57,22 @@ def main():
 		Received = re.findall(ipPattern,str(message['Received']))
 		if Received:
 			print Received[-1]
+			country, city = get_iprecord(Received[-1])			
+			print get_iprecord(Received[-1])
 		else:
 			Received = "None"
 
 		XIP = message['X-Originating-IP']
 		if XIP:
 			XIP = str(XIP).strip('[]')
+			Xcountry, Xcity = get_iprecord(XIP)
 		else:
 			XIP = "None"
 		XMailer = str(message['X-Mailer'])
 		#Attachment = message.get_filename()
 		#Body = str(message['Body'])
 
-		writer.writerow((Date,From,Return,To,XTo,Subject,Received[-1],XIP,XMailer))
+		writer.writerow((Date,From,Return,To,XTo,Subject,Received[-1],city,country,XIP,Xcity,Xcountry,XMailer))
   finally:
     	f.close()
 
