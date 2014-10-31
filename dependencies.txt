@@ -1,4 +1,6 @@
 
+#Requires geoip2
+sudo pip install geoip2
 
 Requires geoip:
 # clone repository
