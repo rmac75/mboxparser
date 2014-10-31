@@ -16,18 +16,20 @@ import pprint
 import argparse
 import geoip2.database
 import geoip2.errors
+import pygeoip
 
 def get_iprecord(ip):
     try:
         geo = reader.city(ip)
+	org = reader2.org_by_addr(ip)
     except (geoip2.errors.AddressNotFoundError, ValueError):
-        return None,None
+        return None,None,None
     if geo.city.name:
 	cityname=geo.city.name.encode('ascii','ignore')
     else:
 	cityname=geo.city.name
 
-    return geo.country.iso_code, cityname
+    return geo.country.iso_code, cityname, org
 
 def main():
 
@@ -46,11 +48,13 @@ def main():
 
   global reader
   reader = geoip2.database.Reader('geo/GeoLite2-City.mmdb')
+  global reader2
+  reader2 = pygeoip.GeoIP('geo/GeoIPOrg.dat')
 
   f = open(outfile, 'wt')
   try:
     	writer = csv.writer(f)
-  	writer.writerow( ('Date','From','Return-Path','To','X-To','Subject','Received-Last', 'City', 'Country','X-IP', 'X-City', 'X-Country','X-Mailer'))
+  	writer.writerow( ('Date','From','Return-Path','To','X-To','Subject','Received-Last','Org','City', 'Country','X-Org','X-IP', 'X-City', 'X-Country','X-Mailer'))
 
 	for message in mailbox.mbox(mbox):
     		From = str(message['From'])
@@ -64,22 +68,23 @@ def main():
 		Received = re.findall(ipPattern,str(message['Received']))
 		if Received:
 			print Received[-1]
-			country, city = get_iprecord(Received[-1])			
+			country, city, org = get_iprecord(Received[-1])			
 			print get_iprecord(Received[-1])
+			print org
 		else:
 			Received = "None"
 
 		XIP = message['X-Originating-IP']
 		if XIP:
 			XIP = str(XIP).strip('[]')
-			Xcountry, Xcity = get_iprecord(XIP)
+			Xcountry, Xcity, Xorg = get_iprecord(XIP)
 		else:
 			XIP = "None"
 		XMailer = str(message['X-Mailer'])
 		#Attachment = message.get_filename()
 		#Body = str(message['Body'])
 
-		writer.writerow((Date,From,Return,To,XTo,Subject,Received[-1],city,country,XIP,Xcity,Xcountry,XMailer))
+		writer.writerow((Date,From,Return,To,XTo,Subject,Received[-1],org,city,country,XIP,Xorg,Xcity,Xcountry,XMailer))
   finally:
     	f.close()
 
