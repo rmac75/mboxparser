@@ -54,7 +54,7 @@ def main():
   f = open(outfile, 'wt')
   try:
     	writer = csv.writer(f)
-  	writer.writerow( ('Date','From','Return-Path','To','X-To','Subject','Received-Last','Org','City', 'Country','X-Org','X-IP', 'X-City', 'X-Country','X-Mailer'))
+  	writer.writerow( ('Date','From','Return-Path','To','X-To','Subject','Received-Last','Org','City', 'Country','X-IP','X-Org', 'X-City', 'X-Country','X-Mailer'))
 
 	for message in mailbox.mbox(mbox):
     		From = str(message['From'])
@@ -77,9 +77,14 @@ def main():
 		XIP = message['X-Originating-IP']
 		if XIP:
 			XIP = str(XIP).strip('[]')
+			print ("XIP: %s." % XIP)
 			Xcountry, Xcity, Xorg = get_iprecord(XIP)
 		else:
 			XIP = "None"
+			Xcountry = "None"
+			Xcity = "None"
+			Xorg = "None"
+
 		XMailer = str(message['X-Mailer'])
 		#Attachment = message.get_filename()
 		#Body = str(message['Body'])
