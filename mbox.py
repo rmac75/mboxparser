@@ -17,6 +17,7 @@ import argparse
 import geoip2.database
 import geoip2.errors
 import pygeoip
+import email.utils
 
 def get_iprecord(ip):
     try:
@@ -54,12 +55,17 @@ def main():
   f = open(outfile, 'wt')
   try:
     	writer = csv.writer(f)
-  	writer.writerow( ('Date','From','Return-Path','To','X-To','Subject','Received-Last','Org','City', 'Country','X-IP','X-Org', 'X-City', 'X-Country','X-Mailer'))
+  	writer.writerow( ('Date','From','From Email','Return-Path Email','To','To Email','X-To','Subject','Received-Last','Org','City', 'Country','X-IP','X-Org', 'X-City', 'X-Country','X-Mailer'))
 
 	for message in mailbox.mbox(mbox):
     		From = str(message['From'])
+		fname,femail = email.utils.parseaddr(From)
+		#print fname
 		Return = str(message['Return-Path'])
+		rname,remail = email.utils.parseaddr(Return)
+		#print remail
 		To = str(message['To'])
+		tname,temail = email.utils.parseaddr(To)
 		XTo = str(message['X-Apparently-To'])
 		#findIP = re.findall(ipPattern,s)
 		Date = str(message['Date'])
@@ -67,17 +73,17 @@ def main():
 
 		Received = re.findall(ipPattern,str(message['Received']))
 		if Received:
-			print Received[-1]
+			#print Received[-1]
 			country, city, org = get_iprecord(Received[-1])			
-			print get_iprecord(Received[-1])
-			print org
+			#print get_iprecord(Received[-1])
+			#print org
 		else:
 			Received = "None"
 
 		XIP = message['X-Originating-IP']
 		if XIP:
 			XIP = str(XIP).strip('[]')
-			print ("XIP: %s." % XIP)
+			#print ("XIP: %s." % XIP)
 			Xcountry, Xcity, Xorg = get_iprecord(XIP)
 		else:
 			XIP = "None"
@@ -89,7 +95,7 @@ def main():
 		#Attachment = message.get_filename()
 		#Body = str(message['Body'])
 
-		writer.writerow((Date,From,Return,To,XTo,Subject,Received[-1],org,city,country,XIP,Xorg,Xcity,Xcountry,XMailer))
+		writer.writerow((Date,fname,femail,remail,tname,temail,XTo,Subject,Received[-1],org,city,country,XIP,Xorg,Xcity,Xcountry,XMailer))
   finally:
     	f.close()
 
