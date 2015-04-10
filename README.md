@@ -1,9 +1,7 @@
 mboxparser
 ==========
 
-Python to parse and exploit email stores in mbox files. Extracts various fields from email in mailbox format and writes the output to csv or a database.
-
-Future: Will do addition header analysis to identify source IPs, add geolocation, etc.
+Python to parse and exploit email stores in mbox files. Extracts various fields from email in mailbox format and writes the output to csv (database in the future).
 
 mbox.py: Parse mbox file
 
