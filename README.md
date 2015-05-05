@@ -9,3 +9,6 @@ Usage: mbox.py mboxfile outfile
 
 Example: ./mbox.py mbox_file output.csv
 
+
+This product includes GeoLite data created by MaxMind, available from 
+<a href="http://www.maxmind.com">http://www.maxmind.com</a>.
