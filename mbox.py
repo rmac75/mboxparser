@@ -18,6 +18,7 @@ import geoip2.database
 import geoip2.errors
 import pygeoip
 import email.utils
+from email.utils import getaddresses
 
 def get_iprecord(ip):
     try:
@@ -55,7 +56,7 @@ def main():
   f = open(outfile, 'wt')
   try:
     	writer = csv.writer(f)
-  	writer.writerow( ('Date','From','From Email','Return-Path Email','To','To Email','X-To','Subject','Received-Last','Org','City', 'Country','X-IP','X-Org', 'X-City', 'X-Country','X-Mailer'))
+  	writer.writerow( ('Date','From','From Email','Return-Path Email','To','To Email','Recipients','X-To','Subject','Received-Last','Org','City', 'Country','X-IP','X-Org', 'X-City', 'X-Country','X-Mailer'))
 
 	for message in mailbox.mbox(mbox):
     		From = str(message['From'])
@@ -66,6 +67,13 @@ def main():
 		#print remail
 		To = str(message['To'])
 		tname,temail = email.utils.parseaddr(To)
+		
+		tos = message.get_all('to', [])
+		ccs = message.get_all('cc', [])
+		resent_tos = message.get_all('resent-to', [])
+		resent_ccs = message.get_all('resent-cc', [])
+		all_recipients = getaddresses(tos + ccs + resent_tos + resent_ccs)
+		
 		XTo = str(message['X-Apparently-To'])
 		#findIP = re.findall(ipPattern,s)
 		Date = str(message['Date'])
@@ -95,7 +103,7 @@ def main():
 		#Attachment = message.get_filename()
 		#Body = str(message['Body'])
 
-		writer.writerow((Date,fname,femail,remail,tname,temail,XTo,Subject,Received[-1],org,city,country,XIP,Xorg,Xcity,Xcountry,XMailer))
+		writer.writerow((Date,fname,femail,remail,tname,temail,all_recipients,XTo,Subject,Received[-1],org,city,country,XIP,Xorg,Xcity,Xcountry,XMailer))
   finally:
     	f.close()
 
